@@ -1,103 +1,96 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import { products } from "../../../data/products";
-import { useCart } from "../../../context/cart-context";
+import { useTheme } from "../../../context/theme-context";
+import Link from "next/link";
+
+const formatPrice = (value: number) =>
+  value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 export default function ProductDetailPage() {
-  const params = useParams<{ slug?: string }>();
-  const slug = params?.slug as string | undefined;
+  const { slug } = useParams<{ slug: string }>();
+  const { isDark } = useTheme();
 
-  const product = products.find((p) => p.slug === slug);
-  const { addToCart } = useCart();
-  const router = useRouter();
+  const product = useMemo(
+    () => products.find((p) => p.slug === slug),
+    [slug]
+  );
 
   if (!product) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16">
-        <p className="mb-4 text-slate-700">Produk tidak ditemukan.</p>
+      <div className="max-w-4xl mx-auto px-4 py-20">
+        <p className="text-sm text-slate-500 dark:text-slate-300">
+          Produk tidak ditemukan.
+        </p>
         <Link
           href="/products"
-          className="text-sm text-blue-600 hover:underline"
+          className="mt-4 inline-block text-xs text-indigo-500 hover:underline"
         >
-          ← Kembali ke Produk
+          ← Kembali ke daftar produk
         </Link>
       </div>
     );
   }
 
-  const handleAddToCart = () => {
-    addToCart(product, 1);
-    router.push("/cart");
-  };
-
   return (
-    <div className="max-w-5xl mx-auto px-4 py-16">
-      <div className="mb-4 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="text-sm text-slate-600 hover:text-slate-900"
-        >
-          ← Kembali
-        </button>
-        <Link
-          href="/cart"
-          className="text-sm text-blue-600 hover:underline"
-        >
-          Lihat Keranjang
-        </Link>
-      </div>
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <Link
+        href="/products"
+        className="text-xs text-indigo-500 hover:underline mb-4 inline-block"
+      >
+        ← Kembali ke produk
+      </Link>
 
-      <div className="mt-4 grid gap-8 md:grid-cols-2">
-        <div className="bg-white/80 rounded-xl border border-slate-200 shadow-sm p-4">
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="w-full h-auto object-cover rounded-md"
-          />
-        </div>
+      <div className="grid md:grid-cols-2 gap-10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 object-cover"
+        />
+
         <div>
-          <h1 className="text-3xl font-bold mb-3 text-slate-900">
-            {product.name}
-          </h1>
-          <p className="text-2xl font-semibold mb-2 text-slate-900">
-            Rp {product.price.toLocaleString("id-ID")}
+          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+          <p className="text-xl font-semibold text-indigo-500 dark:text-indigo-300">
+            Rp {formatPrice(product.price)}
           </p>
-          {product.stock != null && (
-            <p className="text-sm mb-4">
-              <span className="text-slate-600">Stok: </span>
-              <span className="font-medium text-slate-900">
-                {product.stock}
-              </span>
-              {product.stock <= 5 && (
-                <span className="ml-2 inline-flex items-center rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-[10px] font-medium">
-                  Stok terbatas
-                </span>
-              )}
+
+          {product.stock !== undefined && (
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Stok: {product.stock}
             </p>
           )}
-          <p className="text-slate-600 mb-6">{product.description}</p>
 
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6 text-xs">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-4">
+            {product.description}
+          </p>
+
+          {product.tags && (
+            <div className="mt-4 flex flex-wrap gap-2">
               {product.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-slate-100 text-slate-600 px-3 py-1"
+                  className={`px-2 py-1 rounded-full text-[10px] border ${
+                    isDark
+                      ? "border-slate-700 bg-slate-900"
+                      : "border-slate-200 bg-slate-50"
+                  }`}
                 >
-                  {tag}
+                  #{tag}
                 </span>
               ))}
             </div>
           )}
 
           <button
-            onClick={handleAddToCart}
-            className="rounded-md bg-blue-600 text-white px-6 py-3 text-sm font-medium hover:bg-blue-700 transition shadow-sm"
+            className="mt-8 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-sm transition"
+            onClick={() =>
+              alert("Ini masih demo UI. Integrasi cart/backend nanti di step berikutnya 😉")
+            }
           >
-            Tambah ke Keranjang
+            Tambah ke keranjang
           </button>
         </div>
       </div>

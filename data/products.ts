@@ -34,7 +34,7 @@ export const products: Product[] = [
   {
     id: "p3",
     slug: "topi-hitam",
-    name: "Topi-Hitam",
+    name: "Topi Hitam",
     price: 59000,
     imageUrl: "https://via.placeholder.com/400x400?text=Topi+Hitam",
     description: "Topi hitam simple, cocok untuk harian.",
@@ -112,5 +112,4 @@ export const products: Product[] = [
     tags: ["wallet", "accessories"],
     stock: 25,
   },
-  // tinggal lanjut p11–p20 dengan pola yang sama kalau mau
 ];
